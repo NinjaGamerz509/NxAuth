@@ -73,7 +73,14 @@
         <dependency>
             <groupId>io.javalin</groupId>
             <artifactId>javalin</artifactId>
-            <version>6.3.0</version>
+            <version>5.6.3</version>
+        </dependency>
+
+        <!-- Kotlin stdlib required by Javalin -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>1.9.23</version>
         </dependency>
 
         <!-- Jackson JSON -->
@@ -175,6 +182,10 @@
                                 <relocation>
                                     <pattern>okhttp3</pattern>
                                     <shadedPattern>dev.nxauth.libs.okhttp</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>kotlin</pattern>
+                                    <shadedPattern>dev.nxauth.libs.kotlin</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
