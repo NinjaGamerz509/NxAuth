@@ -42,6 +42,7 @@ public class NxAuth extends JavaPlugin {
     private BackupManager backupManager;
     private PremiumManager premiumManager;
     private WebServer webServer;
+    private dev.nxauth.auth.CaptchaManager captchaManager;
 
     @Override
     public void onEnable() {
@@ -78,6 +79,7 @@ public class NxAuth extends JavaPlugin {
         discordWebhook = new DiscordWebhook(this);
         backupManager = new BackupManager(this);
         premiumManager = new PremiumManager(this);
+        captchaManager = new dev.nxauth.auth.CaptchaManager(this);
 
         // Register listeners
         registerListeners();
@@ -214,4 +216,5 @@ public class NxAuth extends JavaPlugin {
     public BackupManager getBackupManager() { return backupManager; }
     public PremiumManager getPremiumManager() { return premiumManager; }
     public WebServer getWebServer() { return webServer; }
+    public dev.nxauth.auth.CaptchaManager getCaptchaManager() { return captchaManager; }
 }

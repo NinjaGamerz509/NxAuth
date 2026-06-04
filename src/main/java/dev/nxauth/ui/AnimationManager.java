@@ -33,7 +33,7 @@ public class AnimationManager {
             FireworkMeta meta = fw.getFireworkMeta();
 
             FireworkEffect effect = FireworkEffect.builder()
-                .withColor(Color.RED, Color.GOLD, Color.YELLOW)
+                .withColor(Color.RED, Color.fromRGB(255, 165, 0), Color.YELLOW)
                 .withFade(Color.WHITE)
                 .with(FireworkEffect.Type.BALL_LARGE)
                 .trail(true)

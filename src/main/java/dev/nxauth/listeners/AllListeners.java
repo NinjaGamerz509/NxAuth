@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 // ============================================================
 // PlayerQuitListener
 // ============================================================
-class PlayerQuitListener implements Listener {
+public class PlayerQuitListener implements Listener {
     private final NxAuth plugin;
     public PlayerQuitListener(NxAuth plugin) { this.plugin = plugin; }
 
@@ -36,7 +36,7 @@ class PlayerQuitListener implements Listener {
 // ============================================================
 // PlayerMoveListener - freeze unauthenticated players
 // ============================================================
-class PlayerMoveListener implements Listener {
+public class PlayerMoveListener implements Listener {
     private final NxAuth plugin;
     public PlayerMoveListener(NxAuth plugin) { this.plugin = plugin; }
 
@@ -62,7 +62,7 @@ class PlayerMoveListener implements Listener {
 // ============================================================
 // PlayerChatListener - intercept chat for captcha / 2fa
 // ============================================================
-class PlayerChatListener implements Listener {
+public class PlayerChatListener implements Listener {
     private final NxAuth plugin;
     public PlayerChatListener(NxAuth plugin) { this.plugin = plugin; }
 
@@ -78,7 +78,7 @@ class PlayerChatListener implements Listener {
 // ============================================================
 // PlayerCommandListener - block non-auth commands
 // ============================================================
-class PlayerCommandListener implements Listener {
+public class PlayerCommandListener implements Listener {
     private final NxAuth plugin;
     private static final java.util.Set<String> ALLOWED = java.util.Set.of(
         "login", "l", "log", "register", "reg", "2fa", "language", "lang"
@@ -104,7 +104,7 @@ class PlayerCommandListener implements Listener {
 // ============================================================
 // ServerPingListener - MOTD changer
 // ============================================================
-class ServerPingListener implements Listener {
+public class ServerPingListener implements Listener {
     private final NxAuth plugin;
     public ServerPingListener(NxAuth plugin) { this.plugin = plugin; }
 
@@ -119,7 +119,7 @@ class ServerPingListener implements Listener {
 // ============================================================
 // WorldChangeListener - per-world auth
 // ============================================================
-class WorldChangeListener implements Listener {
+public class WorldChangeListener implements Listener {
     private final NxAuth plugin;
     public WorldChangeListener(NxAuth plugin) { this.plugin = plugin; }
 

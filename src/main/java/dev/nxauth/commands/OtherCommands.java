@@ -9,7 +9,7 @@ import java.util.Map;
 // ============================================================
 // RegisterCommand
 // ============================================================
-class RegisterCommand implements CommandExecutor {
+public class RegisterCommand implements CommandExecutor {
     private final NxAuth plugin;
     RegisterCommand(NxAuth plugin) { this.plugin = plugin; }
 
@@ -55,7 +55,7 @@ class RegisterCommand implements CommandExecutor {
 // ============================================================
 // LogoutCommand
 // ============================================================
-class LogoutCommand implements CommandExecutor {
+public class LogoutCommand implements CommandExecutor {
     private final NxAuth plugin;
     LogoutCommand(NxAuth plugin) { this.plugin = plugin; }
 
@@ -77,7 +77,7 @@ class LogoutCommand implements CommandExecutor {
 // ============================================================
 // ChangePasswordCommand
 // ============================================================
-class ChangePasswordCommand implements CommandExecutor {
+public class ChangePasswordCommand implements CommandExecutor {
     private final NxAuth plugin;
     ChangePasswordCommand(NxAuth plugin) { this.plugin = plugin; }
 
@@ -121,7 +121,7 @@ class ChangePasswordCommand implements CommandExecutor {
 // ============================================================
 // LanguageCommand
 // ============================================================
-class LanguageCommand implements CommandExecutor {
+public class LanguageCommand implements CommandExecutor {
     private final NxAuth plugin;
     LanguageCommand(NxAuth plugin) { this.plugin = plugin; }
 
@@ -152,7 +152,7 @@ class LanguageCommand implements CommandExecutor {
 // ============================================================
 // TwoFACommand
 // ============================================================
-class TwoFACommand implements CommandExecutor {
+public class TwoFACommand implements CommandExecutor {
     private final NxAuth plugin;
     TwoFACommand(NxAuth plugin) { this.plugin = plugin; }
 
