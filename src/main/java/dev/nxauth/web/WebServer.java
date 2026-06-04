@@ -35,8 +35,11 @@ public class WebServer {
                     staticFiles.directory = "/web";
                     staticFiles.location = Location.CLASSPATH;
                 });
-                config.plugins.enableCors(cors ->
-                    cors.addRule(it -> it.anyHost()));
+                config.plugins.enableCors(cors -> {
+                    cors.addRule(rule -> {
+                        rule.anyHost();
+                    });
+                });
             }).start(port);
 
             registerRoutes();
