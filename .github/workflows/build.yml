@@ -27,11 +27,9 @@ jobs:
       - name: 🔨 Build with Maven
         run: mvn clean package -B --no-transfer-progress
 
-      - name: 📦 Rename JAR
+      - name: 📦 Get Version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          mv target/NxAuth-*.jar target/NxAuth-${VERSION}.jar
-          echo "JAR_NAME=NxAuth-${VERSION}.jar" >> $GITHUB_ENV
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: 📤 Upload Build Artifact
@@ -44,8 +42,7 @@ jobs:
       - name: 🧪 Print Build Info
         run: |
           echo "✅ Build successful!"
-          echo "📦 File: ${{ env.JAR_NAME }}"
-          echo "📏 Size: $(du -sh target/${{ env.JAR_NAME }} | cut -f1)"
+          echo "📏 Size: $(du -sh target/NxAuth-${{ env.VERSION }}.jar | cut -f1)"
 
   release:
     name: Create GitHub Release
@@ -67,10 +64,9 @@ jobs:
       - name: 🔨 Build with Maven
         run: mvn clean package -B --no-transfer-progress
 
-      - name: 📦 Get Version & Rename
+      - name: 📦 Get Version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          mv target/NxAuth-*.jar target/NxAuth-${VERSION}.jar
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: 📝 Generate Release Notes
