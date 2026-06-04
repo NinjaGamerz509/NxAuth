@@ -97,18 +97,19 @@ public class DatabaseManager {
             """);
 
             // Login logs table
-            stmt.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS nxauth_logs (
-                    id INTEGER PRIMARY KEY """ + (dbType.equals("mysql") ? "AUTO_INCREMENT" : "AUTOINCREMENT") + """,
-                    uuid VARCHAR(36),
-                    username VARCHAR(16),
-                    event_type VARCHAR(50),
-                    ip_address VARCHAR(45),
-                    success BOOLEAN,
-                    details TEXT,
-                    timestamp BIGINT
-                )
-            """);
+            String autoInc = dbType.equals("mysql") ? "AUTO_INCREMENT" : "AUTOINCREMENT";
+            stmt.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS nxauth_logs (" +
+                "    id INTEGER PRIMARY KEY " + autoInc + "," +
+                "    uuid VARCHAR(36)," +
+                "    username VARCHAR(16)," +
+                "    event_type VARCHAR(50)," +
+                "    ip_address VARCHAR(45)," +
+                "    success BOOLEAN," +
+                "    details TEXT," +
+                "    timestamp BIGINT" +
+                ")"
+            );
 
             // IP bans table
             stmt.executeUpdate("""
