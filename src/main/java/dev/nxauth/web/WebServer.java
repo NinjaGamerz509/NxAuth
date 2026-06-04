@@ -35,7 +35,7 @@ public class WebServer {
                     staticFiles.directory = "/web";
                     staticFiles.location = Location.CLASSPATH;
                 });
-                config.bundledPlugins.enableCors(cors ->
+                config.plugins.enableCors(cors ->
                     cors.addRule(it -> it.anyHost()));
             }).start(port);
 
@@ -70,7 +70,6 @@ public class WebServer {
             String auth = ctx.header("Authorization");
             if (auth == null || !auth.startsWith("Bearer ")) {
                 ctx.status(401).json(Map.of("error", "Unauthorized"));
-                ctx.skipRemainingHandlers();
                 return;
             }
             String token = auth.substring(7);
@@ -78,7 +77,6 @@ public class WebServer {
             if (expiry == null || System.currentTimeMillis() > expiry) {
                 sessions.remove(token);
                 ctx.status(401).json(Map.of("error", "Session expired"));
-                ctx.skipRemainingHandlers();
             }
         });
 
