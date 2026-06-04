@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NxAuth Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; }
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; }
+        .sidebar { background: #0f172a; border-right: 1px solid #1e293b; }
+        .nav-item { transition: all 0.2s; border-radius: 8px; }
+        .nav-item:hover, .nav-item.active { background: #1e3a5f; color: #60a5fa; }
+        .stat-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #334155; }
+        input, select, textarea { background: #0f172a !important; border-color: #334155 !important; color: #e2e8f0 !important; }
+        input:focus, select:focus { border-color: #3b82f6 !important; outline: none !important; box-shadow: 0 0 0 2px rgba(59,130,246,0.2) !important; }
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .btn-primary:hover { background: linear-gradient(135deg, #2563eb, #1e40af); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .badge-online { background: #22c55e22; color: #22c55e; border: 1px solid #22c55e44; }
+        .badge-offline { background: #ef444422; color: #ef4444; border: 1px solid #ef444444; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .glow { box-shadow: 0 0 20px rgba(59,130,246,0.2); }
+        #toast { transition: all 0.3s; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<!-- Sidebar -->
+<div class="sidebar w-64 flex flex-col p-4 shrink-0 h-full overflow-y-auto" id="sidebar">
+    <div class="flex items-center gap-3 mb-8 px-2">
+        <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center glow">
+            <i class="fas fa-shield-alt text-white"></i>
+        </div>
+        <div>
+            <div class="font-bold text-white text-lg">NxAuth</div>
+            <div class="text-xs text-slate-400">Admin Dashboard</div>
+        </div>
+    </div>
+
+    <nav class="flex flex-col gap-1">
+        <button onclick="showPage('dashboard')" class="nav-item active px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-dashboard">
+            <i class="fas fa-gauge-high w-5 text-center"></i> Dashboard
+        </button>
+        <button onclick="showPage('players')" class="nav-item px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-players">
+            <i class="fas fa-users w-5 text-center"></i> Players
+        </button>
+        <button onclick="showPage('logs')" class="nav-item px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-logs">
+            <i class="fas fa-scroll w-5 text-center"></i> Logs
+        </button>
+        <button onclick="showPage('config')" class="nav-item px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-config">
+            <i class="fas fa-sliders w-5 text-center"></i> Config
+        </button>
+        <button onclick="showPage('backup')" class="nav-item px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-backup">
+            <i class="fas fa-database w-5 text-center"></i> Backup
+        </button>
+        <button onclick="showPage('security')" class="nav-item px-3 py-2.5 flex items-center gap-3 text-sm text-slate-300" id="nav-security">
+            <i class="fas fa-lock w-5 text-center"></i> Security
+        </button>
+    </nav>
+
+    <div class="mt-auto pt-4 border-t border-slate-800">
+        <div class="text-xs text-slate-500 px-2 mb-2">Server Status</div>
+        <div class="flex items-center gap-2 px-2">
+            <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            <span class="text-xs text-slate-400" id="server-status">Online</span>
+        </div>
+        <button onclick="logout()" class="nav-item w-full mt-3 px-3 py-2 flex items-center gap-3 text-sm text-red-400 text-left">
+            <i class="fas fa-sign-out-alt w-5 text-center"></i> Logout
+        </button>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Topbar -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+        <h1 class="text-xl font-semibold text-white" id="page-title">Dashboard</h1>
+        <div class="flex items-center gap-4">
+            <div class="text-sm text-slate-400" id="last-updated">Loading...</div>
+            <button onclick="refreshData()" class="text-slate-400 hover:text-blue-400 transition">
+                <i class="fas fa-rotate-right"></i>
+            </button>
+            <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold">A</div>
+        </div>
+    </div>
+
+    <!-- Pages -->
+    <div class="flex-1 overflow-y-auto p-6">
+
+        <!-- ===== DASHBOARD PAGE ===== -->
+        <div id="page-dashboard">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-slate-400 text-sm">Total Players</div>
+                        <div class="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center">
+                            <i class="fas fa-users text-blue-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-white" id="stat-total">-</div>
+                    <div class="text-xs text-slate-500 mt-1">Registered accounts</div>
+                </div>
+                <div class="stat-card rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-slate-400 text-sm">Online Now</div>
+                        <div class="w-8 h-8 rounded-lg bg-green-600/20 flex items-center justify-center">
+                            <i class="fas fa-circle text-green-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-white" id="stat-online">-</div>
+                    <div class="text-xs text-slate-500 mt-1">of <span id="stat-max">-</span> max</div>
+                </div>
+                <div class="stat-card rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-slate-400 text-sm">Failed Logins</div>
+                        <div class="w-8 h-8 rounded-lg bg-red-600/20 flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-red-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="text-2xl font-bold text-white" id="stat-failed">-</div>
+                    <div class="text-xs text-slate-500 mt-1">Last 24 hours</div>
+                </div>
+                <div class="stat-card rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-slate-400 text-sm">Maintenance</div>
+                        <div class="w-8 h-8 rounded-lg bg-yellow-600/20 flex items-center justify-center">
+                            <i class="fas fa-wrench text-yellow-400 text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-1">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="maintenance-toggle" class="sr-only peer" onchange="toggleMaintenance(this)">
+                            <div class="w-9 h-5 bg-slate-700 rounded-full peer peer-checked:bg-yellow-500 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
+                        <span class="text-sm text-slate-400" id="maintenance-label">Off</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Online Players -->
+            <div class="card p-5 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-white">Online Players</h2>
+                    <span class="text-xs text-slate-500" id="online-count">0 online</span>
+                </div>
+                <div id="online-players-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div class="text-slate-500 text-sm text-center py-4 col-span-3">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card p-5">
+                <h2 class="font-semibold text-white mb-4">Quick Actions</h2>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="confirmAction('reload', null)" class="btn-primary text-white text-sm px-4 py-2 rounded-lg">
+                        <i class="fas fa-rotate-right mr-2"></i>Reload Config
+                    </button>
+                    <button onclick="showPage('backup')" class="btn-success text-white text-sm px-4 py-2 rounded-lg">
+                        <i class="fas fa-database mr-2"></i>Create Backup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PLAYERS PAGE ===== -->
+        <div id="page-players" class="hidden">
+            <div class="card p-5 mb-4">
+                <div class="flex gap-3 mb-4">
+                    <input type="text" id="player-search" placeholder="Search player..." class="flex-1 rounded-lg px-4 py-2 text-sm border" oninput="searchPlayers()">
+                    <select id="player-filter" class="rounded-lg px-3 py-2 text-sm border" onchange="searchPlayers()">
+                        <option value="all">All Players</option>
+                        <option value="online">Online Only</option>
+                        <option value="banned">Banned</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr class="text-slate-400 border-b border-slate-800">
+                            <th class="text-left pb-3">Player</th>
+                            <th class="text-left pb-3">Status</th>
+                            <th class="text-left pb-3">Last Login</th>
+                            <th class="text-left pb-3">IP</th>
+                            <th class="text-left pb-3">2FA</th>
+                            <th class="text-left pb-3">Actions</th>
+                        </tr></thead>
+                        <tbody id="players-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LOGS PAGE ===== -->
+        <div id="page-logs" class="hidden">
+            <div class="card p-5">
+                <div class="flex gap-3 mb-4">
+                    <select id="log-filter" class="rounded-lg px-3 py-2 text-sm border" onchange="loadLogs()">
+                        <option value="all">All Events</option>
+                        <option value="LOGIN">Logins</option>
+                        <option value="LOGIN_FAIL">Failed Logins</option>
+                        <option value="REGISTER">Registrations</option>
+                        <option value="TEMPBAN">Bans</option>
+                    </select>
+                    <button onclick="loadLogs()" class="btn-primary text-white text-sm px-4 py-2 rounded-lg">Refresh</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr class="text-slate-400 border-b border-slate-800">
+                            <th class="text-left pb-3">Time</th>
+                            <th class="text-left pb-3">Player</th>
+                            <th class="text-left pb-3">Event</th>
+                            <th class="text-left pb-3">IP</th>
+                            <th class="text-left pb-3">Result</th>
+                        </tr></thead>
+                        <tbody id="logs-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CONFIG PAGE ===== -->
+        <div id="page-config" class="hidden">
+            <div class="card p-5 mb-4">
+                <h2 class="font-semibold text-white mb-1">Configuration Editor</h2>
+                <p class="text-xs text-slate-400 mb-4">Changes are saved to config.yml immediately.</p>
+                <div id="config-sections" class="space-y-4"></div>
+                <div class="mt-6 flex gap-3">
+                    <button onclick="saveConfig()" class="btn-primary text-white text-sm px-6 py-2 rounded-lg">
+                        <i class="fas fa-save mr-2"></i>Save & Reload
+                    </button>
+                    <button onclick="loadConfig()" class="text-slate-400 hover:text-white text-sm px-4 py-2 rounded-lg border border-slate-700">
+                        <i class="fas fa-rotate-right mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BACKUP PAGE ===== -->
+        <div id="page-backup" class="hidden">
+            <div class="card p-5 mb-4">
+                <h2 class="font-semibold text-white mb-4">Backup Management</h2>
+                <div class="flex gap-3 mb-6">
+                    <button onclick="createBackup()" class="btn-success text-white text-sm px-5 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Create Backup Now
+                    </button>
+                    <button onclick="exportCSV()" class="btn-primary text-white text-sm px-5 py-2 rounded-lg">
+                        <i class="fas fa-file-csv mr-2"></i>Export Players CSV
+                    </button>
+                </div>
+                <h3 class="text-sm font-medium text-slate-300 mb-3">Existing Backups</h3>
+                <div id="backup-list" class="space-y-2">
+                    <div class="text-slate-500 text-sm">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECURITY PAGE ===== -->
+        <div id="page-security" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div class="card p-5">
+                    <h2 class="font-semibold text-white mb-4">IP Bans</h2>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="ipban-input" placeholder="Enter IP address..." class="flex-1 rounded-lg px-3 py-2 text-sm border">
+                        <button onclick="banIP()" class="btn-danger text-white text-sm px-4 py-2 rounded-lg">Ban IP</button>
+                    </div>
+                    <div id="ipban-list" class="space-y-2 text-sm"></div>
+                </div>
+                <div class="card p-5">
+                    <h2 class="font-semibold text-white mb-4">Active Sessions</h2>
+                    <div id="sessions-list" class="space-y-2 text-sm"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div id="login-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+    <div class="card p-8 w-96 glow">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
+                <i class="fas fa-shield-alt text-white text-xl"></i>
+            </div>
+            <div>
+                <div class="text-xl font-bold text-white">NxAuth</div>
+                <div class="text-sm text-slate-400">Admin Dashboard</div>
+            </div>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm text-slate-400 block mb-1">Password</label>
+                <input type="password" id="login-password" placeholder="Enter admin password"
+                    class="w-full rounded-lg px-4 py-2.5 text-sm border" onkeyup="if(event.key==='Enter')doLogin()">
+            </div>
+            <button onclick="doLogin()" class="btn-primary w-full text-white py-2.5 rounded-lg text-sm font-medium">
+                <i class="fas fa-sign-in-alt mr-2"></i>Login
+            </button>
+            <div id="login-error" class="text-red-400 text-xs text-center hidden">Invalid password!</div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-6 right-6 bg-slate-800 border border-slate-700 rounded-xl px-5 py-3 text-sm hidden z-50 flex items-center gap-3">
+    <i id="toast-icon" class="fas fa-check text-green-400"></i>
+    <span id="toast-msg"></span>
+</div>
+
+<!-- Confirm Dialog -->
+<div id="confirm-dialog" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+    <div class="card p-6 w-80">
+        <h3 class="font-semibold text-white mb-2" id="confirm-title">Confirm Action</h3>
+        <p class="text-sm text-slate-400 mb-5" id="confirm-msg">Are you sure?</p>
+        <div class="flex gap-3">
+            <button onclick="executeConfirmed()" class="btn-primary flex-1 text-white py-2 rounded-lg text-sm">Confirm</button>
+            <button onclick="closeConfirm()" class="flex-1 border border-slate-700 text-slate-300 py-2 rounded-lg text-sm">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let token = localStorage.getItem('nxauth_token');
+let pendingAction = null;
+let pendingPlayer = null;
+let configData = {};
+
+// ===== AUTH =====
+async function doLogin() {
+    const pw = document.getElementById('login-password').value;
+    try {
+        const r = await api('/api/login', 'POST', {password: pw});
+        if (r.token) {
+            token = r.token;
+            localStorage.setItem('nxauth_token', token);
+            document.getElementById('login-modal').classList.add('hidden');
+            init();
+        }
+    } catch {
+        document.getElementById('login-error').classList.remove('hidden');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('nxauth_token');
+    location.reload();
+}
+
+// ===== API =====
+async function api(path, method='GET', body=null) {
+    const opts = {
+        method,
+        headers: {'Content-Type':'application/json', 'Authorization': 'Bearer '+(token||'')},
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const r = await fetch(path, opts);
+    if (r.status === 401) { document.getElementById('login-modal').classList.remove('hidden'); throw new Error('Unauthorized'); }
+    return r.json();
+}
+
+// ===== NAVIGATION =====
+function showPage(page) {
+    ['dashboard','players','logs','config','backup','security'].forEach(p => {
+        document.getElementById('page-'+p).classList.toggle('hidden', p !== page);
+        document.getElementById('nav-'+p).classList.toggle('active', p === page);
+    });
+    document.getElementById('page-title').textContent =
+        page.charAt(0).toUpperCase() + page.slice(1);
+    if (page === 'players') loadPlayers();
+    if (page === 'logs') loadLogs();
+    if (page === 'config') loadConfig();
+    if (page === 'backup') loadBackups();
+    if (page === 'security') loadSecurity();
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
+    try {
+        const data = await api('/api/stats');
+        document.getElementById('stat-total').textContent = data.totalPlayers || 0;
+        document.getElementById('stat-online').textContent = data.onlinePlayers || 0;
+        document.getElementById('stat-max').textContent = data.maxPlayers || 0;
+        document.getElementById('stat-failed').textContent = data.failedLogins24h || 0;
+        document.getElementById('maintenance-toggle').checked = data.maintenance || false;
+        document.getElementById('maintenance-label').textContent = data.maintenance ? 'ON' : 'Off';
+        document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
+        // Online players
+        const list = document.getElementById('online-players-list');
+        document.getElementById('online-count').textContent = (data.onlineList||[]).length + ' online';
+        if (!data.onlineList || data.onlineList.length === 0) {
+            list.innerHTML = '<div class="text-slate-500 text-sm text-center py-4 col-span-3">No players online</div>';
+        } else {
+            list.innerHTML = data.onlineList.map(p => `
+                <div class="flex items-center justify-between bg-slate-800/50 rounded-lg px-3 py-2">
+                    <div class="flex items-center gap-2">
+                        <img src="https://mc-heads.net/avatar/${p.name}/24" class="w-6 h-6 rounded" onerror="this.src='data:image/svg+xml,<svg/>'">
+                        <span class="text-sm font-medium text-white">${p.name}</span>
+                        ${p.authenticated ? '<span class="text-xs badge-online px-1.5 py-0.5 rounded">✓</span>' : '<span class="text-xs badge-offline px-1.5 py-0.5 rounded">!</span>'}
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="confirmAction('forcelogin','${p.name}')" class="text-xs text-blue-400 hover:text-blue-300 px-2 py-1 rounded">Login</button>
+                        <button onclick="confirmAction('kick','${p.name}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded">Kick</button>
+                    </div>
+                </div>`).join('');
+        }
+    } catch(e) { console.error(e); }
+}
+
+// ===== PLAYERS =====
+async function loadPlayers() {
+    const search = document.getElementById('player-search')?.value || '';
+    const filter = document.getElementById('player-filter')?.value || 'all';
+    try {
+        const data = await api(`/api/players?search=${search}&filter=${filter}`);
+        const tbody = document.getElementById('players-table');
+        if (!data.players || data.players.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-slate-500 py-8">No players found</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.players.map(p => `
+            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                <td class="py-3 flex items-center gap-2">
+                    <img src="https://mc-heads.net/avatar/${p.username}/20" class="w-5 h-5 rounded">
+                    <span class="font-medium text-white">${p.username}</span>
+                </td>
+                <td class="py-3"><span class="text-xs px-2 py-1 rounded ${p.online ? 'badge-online' : 'badge-offline'}">${p.online ? 'Online' : 'Offline'}</span></td>
+                <td class="py-3 text-slate-400 text-xs">${p.lastLogin ? new Date(p.lastLogin).toLocaleDateString() : 'Never'}</td>
+                <td class="py-3 text-slate-400 text-xs">${p.ip ? p.ip.replace(/\.\d+\.\d+$/, '.***') : 'N/A'}</td>
+                <td class="py-3">${p.twofa ? '<span class="text-xs text-green-400">✓ On</span>' : '<span class="text-xs text-slate-500">Off</span>'}</td>
+                <td class="py-3">
+                    <div class="flex gap-2">
+                        <button onclick="confirmAction('forcelogin','${p.username}')" class="text-xs text-blue-400 hover:underline">Login</button>
+                        <button onclick="confirmAction('unregister','${p.username}')" class="text-xs text-red-400 hover:underline">Unreg</button>
+                        <button onclick="confirmAction('reset2fa','${p.username}')" class="text-xs text-yellow-400 hover:underline">2FA</button>
+                    </div>
+                </td>
+            </tr>`).join('');
+    } catch(e) { console.error(e); }
+}
+
+function searchPlayers() { loadPlayers(); }
+
+// ===== LOGS =====
+async function loadLogs() {
+    const filter = document.getElementById('log-filter')?.value || 'all';
+    try {
+        const data = await api('/api/logs?type=' + filter + '&limit=100');
+        const tbody = document.getElementById('logs-table');
+        if (!data.logs || data.logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-slate-500 py-8">No logs found</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.logs.map(l => `
+            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                <td class="py-2.5 text-slate-400 text-xs whitespace-nowrap">${new Date(l.timestamp).toLocaleString()}</td>
+                <td class="py-2.5 font-medium text-white text-xs">${l.username || 'Unknown'}</td>
+                <td class="py-2.5"><span class="text-xs px-2 py-0.5 rounded bg-slate-700 text-slate-300">${l.eventType}</span></td>
+                <td class="py-2.5 text-slate-400 text-xs">${(l.ip||'N/A').replace(/\.\d+\.\d+$/, '.***')}</td>
+                <td class="py-2.5">${l.success ? '<span class="text-xs text-green-400">✓</span>' : '<span class="text-xs text-red-400">✗</span>'}</td>
+            </tr>`).join('');
+    } catch(e) { console.error(e); }
+}
+
+// ===== CONFIG =====
+async function loadConfig() {
+    try {
+        const data = await api('/api/config');
+        configData = data.config || {};
+        const container = document.getElementById('config-sections');
+        container.innerHTML = '';
+
+        const sections = {
+            'Authentication': ['auth.login-timeout','auth.max-attempts','auth.tempban-duration','auth.afk-logout','auth.min-password-length','auth.max-password-length'],
+            'Security': ['captcha.enabled','captcha.type','two-factor-auth.enabled','two-factor-auth.force-for-admins'],
+            'Premium': ['premium.enabled','premium.bedrock-auto-login'],
+            'Discord': ['discord.enabled','discord.webhook-url'],
+            'Web Dashboard': ['web-dashboard.port','web-dashboard.admin-password'],
+            'Backup': ['backup.enabled','backup.interval-hours','backup.keep-last'],
+        };
+
+        for (const [section, keys] of Object.entries(sections)) {
+            const div = document.createElement('div');
+            div.innerHTML = `<h3 class="text-sm font-semibold text-slate-300 mb-3">${section}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">${
+                keys.map(k => {
+                    const val = getNestedVal(configData, k);
+                    const type = typeof val === 'boolean' ? 'checkbox' : (typeof val === 'number' ? 'number' : 'text');
+                    if (type === 'checkbox') return `
+                        <label class="flex items-center gap-3 bg-slate-800/50 rounded-lg px-4 py-3 cursor-pointer">
+                            <input type="checkbox" data-key="${k}" ${val ? 'checked' : ''} class="w-4 h-4 rounded accent-blue-500">
+                            <span class="text-sm text-slate-300">${k.split('.').pop().replace(/-/g,' ')}</span>
+                        </label>`;
+                    return `
+                        <div class="bg-slate-800/50 rounded-lg px-4 py-3">
+                            <label class="text-xs text-slate-400 block mb-1">${k.split('.').pop().replace(/-/g,' ')}</label>
+                            <input type="${type}" data-key="${k}" value="${val ?? ''}" class="w-full rounded-lg px-3 py-1.5 text-sm border text-sm">
+                        </div>`;
+                }).join('')
+            }</div>`;
+            container.appendChild(div);
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function saveConfig() {
+    const inputs = document.querySelectorAll('#config-sections [data-key]');
+    const updates = {};
+    inputs.forEach(el => {
+        const key = el.dataset.key;
+        updates[key] = el.type === 'checkbox' ? el.checked : (el.type === 'number' ? Number(el.value) : el.value);
+    });
+    try {
+        await api('/api/config', 'POST', {updates});
+        toast('Config saved and reloaded!', 'success');
+    } catch(e) { toast('Failed to save config!', 'error'); }
+}
+
+function getNestedVal(obj, path) {
+    return path.split('.').reduce((o,k) => o?.[k.replace(/-([a-z])/g, (_,c)=>c.toUpperCase())], obj) ??
+           path.split('.').reduce((o,k) => o?.[k], obj);
+}
+
+// ===== BACKUP =====
+async function loadBackups() {
+    try {
+        const data = await api('/api/backups');
+        const list = document.getElementById('backup-list');
+        if (!data.backups || data.backups.length === 0) {
+            list.innerHTML = '<div class="text-slate-500 text-sm">No backups found</div>';
+            return;
+        }
+        list.innerHTML = data.backups.map(b => `
+            <div class="flex items-center justify-between bg-slate-800/50 rounded-lg px-4 py-3">
+                <div>
+                    <div class="text-sm font-medium text-white">${b.name}</div>
+                    <div class="text-xs text-slate-400">${b.size} • ${b.created}</div>
+                </div>
+                <button onclick="restoreBackup('${b.name}')" class="text-xs text-blue-400 hover:text-blue-300">Restore</button>
+            </div>`).join('');
+    } catch(e) { console.error(e); }
+}
+
+async function createBackup() {
+    toast('Creating backup...', 'info');
+    try {
+        await api('/api/backup/create', 'POST');
+        toast('Backup created!', 'success');
+        loadBackups();
+    } catch { toast('Backup failed!', 'error'); }
+}
+
+async function exportCSV() {
+    window.location.href = '/api/players/export?token=' + token;
+}
+
+// ===== SECURITY =====
+async function loadSecurity() {
+    try {
+        const data = await api('/api/security');
+        const ipList = document.getElementById('ipban-list');
+        if (!data.ipBans || data.ipBans.length === 0) {
+            ipList.innerHTML = '<div class="text-slate-500">No IP bans</div>';
+        } else {
+            ipList.innerHTML = data.ipBans.map(b => `
+                <div class="flex items-center justify-between bg-slate-800/50 rounded-lg px-3 py-2">
+                    <span class="font-mono text-slate-300">${b.ip}</span>
+                    <button onclick="unbanIP('${b.ip}')" class="text-xs text-red-400 hover:underline">Unban</button>
+                </div>`).join('');
+        }
+    } catch(e) { console.error(e); }
+}
+
+async function banIP() {
+    const ip = document.getElementById('ipban-input').value.trim();
+    if (!ip) return;
+    try {
+        await api('/api/security/ipban', 'POST', {ip});
+        document.getElementById('ipban-input').value = '';
+        toast('IP banned: ' + ip, 'success');
+        loadSecurity();
+    } catch { toast('Failed to ban IP!', 'error'); }
+}
+
+async function unbanIP(ip) {
+    try {
+        await api('/api/security/ipunban', 'POST', {ip});
+        toast('IP unbanned: ' + ip, 'success');
+        loadSecurity();
+    } catch { toast('Failed to unban IP!', 'error'); }
+}
+
+// ===== ACTIONS =====
+function confirmAction(action, player) {
+    pendingAction = action;
+    pendingPlayer = player;
+    const titles = {forcelogin:'Force Login', kick:'Kick Player', unregister:'Unregister Player', reload:'Reload Config', reset2fa:'Reset 2FA'};
+    document.getElementById('confirm-title').textContent = titles[action] || action;
+    document.getElementById('confirm-msg').textContent = player
+        ? `Are you sure you want to ${action} player "${player}"?`
+        : `Are you sure you want to ${action}?`;
+    document.getElementById('confirm-dialog').classList.remove('hidden');
+}
+
+function closeConfirm() { document.getElementById('confirm-dialog').classList.add('hidden'); }
+
+async function executeConfirmed() {
+    closeConfirm();
+    try {
+        await api('/api/action', 'POST', {action: pendingAction, player: pendingPlayer});
+        toast('Action executed: ' + pendingAction, 'success');
+        refreshData();
+    } catch { toast('Action failed!', 'error'); }
+}
+
+async function toggleMaintenance(el) {
+    try {
+        await api('/api/maintenance', 'POST', {enabled: el.checked});
+        document.getElementById('maintenance-label').textContent = el.checked ? 'ON' : 'Off';
+        toast('Maintenance ' + (el.checked ? 'enabled' : 'disabled'), el.checked ? 'info' : 'success');
+    } catch { el.checked = !el.checked; toast('Failed!', 'error'); }
+}
+
+// ===== TOAST =====
+function toast(msg, type='success') {
+    const t = document.getElementById('toast');
+    const icon = document.getElementById('toast-icon');
+    document.getElementById('toast-msg').textContent = msg;
+    icon.className = `fas fa-${type==='success'?'check':type==='error'?'xmark':'info'} text-${type==='success'?'green':type==='error'?'red':'blue'}-400`;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+// ===== INIT =====
+function refreshData() { loadDashboard(); }
+
+async function init() {
+    await loadDashboard();
+    setInterval(loadDashboard, 30000);
+}
+
+// Check auth on load
+if (token) {
+    document.getElementById('login-modal').classList.add('hidden');
+    init();
+} else {
+    document.getElementById('login-modal').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

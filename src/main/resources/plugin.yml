@@ -1,0 +1,60 @@
+name: NxAuth
+version: '${project.version}'
+main: dev.nxauth.NxAuth
+api-version: '1.21'
+description: Ultimate Authentication Plugin - Secure, Fast, Beautiful
+author: NxAuth Team
+website: https://github.com/yourusername/NxAuth
+
+softdepend:
+  - Geyser-Spigot
+  - floodgate
+
+commands:
+  login:
+    description: Login to your account
+    usage: /login <password>
+    aliases: [l, log]
+  register:
+    description: Register a new account
+    usage: /register <password> <confirmPassword>
+    aliases: [reg]
+  logout:
+    description: Logout from your account
+    usage: /logout
+  changepassword:
+    description: Change your password
+    usage: /changepassword <oldPassword> <newPassword>
+    aliases: [cp, changepw]
+  language:
+    description: Change your language
+    usage: /language <lang>
+    aliases: [lang, setlang]
+  2fa:
+    description: Manage Two-Factor Authentication
+    usage: /2fa <enable|disable|backup>
+  nxauth:
+    description: NxAuth Admin Command
+    usage: /nxauth <subcommand>
+    aliases: [nxa, ultraauth]
+    permission: nxauth.admin
+
+permissions:
+  nxauth.admin:
+    description: Full admin access to NxAuth
+    default: op
+  nxauth.admin.alerts:
+    description: Receive in-game admin alerts
+    default: op
+  nxauth.admin.maintenance.bypass:
+    description: Bypass maintenance mode
+    default: op
+  nxauth.bypass.captcha:
+    description: Skip CAPTCHA verification
+    default: op
+  nxauth.bypass.2fa:
+    description: Skip 2FA verification
+    default: false
+  nxauth.premium.bypass:
+    description: Auto-login as premium player
+    default: false

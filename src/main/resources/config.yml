@@ -1,0 +1,376 @@
+# ███╗   ██╗██╗  ██╗ █████╗ ██╗   ██╗████████╗██╗  ██╗
+# ████╗  ██║╚██╗██╔╝██╔══██╗██║   ██║╚══██╔══╝██║  ██║
+# ██╔██╗ ██║ ╚███╔╝ ███████║██║   ██║   ██║   ███████║
+# ██║╚██╗██║ ██╔██╗ ██╔══██║██║   ██║   ██║   ██╔══██║
+# ██║ ╚████║██╔╝ ██╗██║  ██║╚██████╔╝   ██║   ██║  ██║
+# ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+# Ultimate Authentication Plugin v1.0.0
+# GitHub: https://github.com/yourusername/NxAuth
+
+# ============================================================
+# DATABASE SETTINGS
+# ============================================================
+database:
+  # Type: sqlite | mysql
+  type: sqlite
+  sqlite:
+    file: "nxauth.db"
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "nxauth"
+    username: "root"
+    password: "password"
+    pool-size: 10
+    connection-timeout: 30000
+
+# ============================================================
+# AUTHENTICATION SETTINGS
+# ============================================================
+auth:
+  # Seconds player has to login before being kicked
+  login-timeout: 60
+  # Max failed attempts before tempban
+  max-attempts: 5
+  # Tempban duration in minutes (0 = permanent until manual unban)
+  tempban-duration: 30
+  # Auto-logout on AFK (minutes, 0 = disabled)
+  afk-logout: 10
+  # Remember session by IP (auto-login if same IP)
+  ip-session: true
+  # IP session duration in hours
+  ip-session-duration: 24
+  # Minimum password length
+  min-password-length: 6
+  # Maximum password length
+  max-password-length: 32
+  # Block common/weak passwords
+  block-weak-passwords: true
+  # Force password expiry (days, 0 = disabled)
+  password-expiry-days: 0
+  # Allow multiple accounts per IP
+  allow-multiple-per-ip: true
+  # Max accounts per IP (0 = unlimited)
+  max-accounts-per-ip: 3
+
+# ============================================================
+# PREMIUM / BEDROCK SETTINGS
+# ============================================================
+premium:
+  # Auto-login for premium (paid) Minecraft accounts
+  enabled: true
+  # Auto-login for Bedrock players (via Geyser/Floodgate)
+  bedrock-auto-login: true
+  # Bedrock player prefix (Floodgate default is ".")
+  bedrock-prefix: "."
+
+# ============================================================
+# CAPTCHA SETTINGS
+# ============================================================
+captcha:
+  enabled: true
+  # Type: math | text | image (image = future feature)
+  type: math
+  # Show captcha on: register | login | both
+  show-on: register
+  # Captcha timeout in seconds
+  timeout: 30
+  # Number of failed captcha before kick
+  max-fails: 3
+
+# ============================================================
+# 2FA SETTINGS
+# ============================================================
+two-factor-auth:
+  enabled: true
+  # Force 2FA for players with nxauth.admin permission
+  force-for-admins: true
+  # Allow players to enable/disable their own 2FA
+  player-toggle: true
+  # Number of backup codes to generate
+  backup-codes-count: 8
+
+# ============================================================
+# CUSTOM JOIN SCREEN
+# ============================================================
+join-screen:
+  enabled: true
+  # Teleport player to auth location on join
+  auth-location:
+    enabled: true
+    world: "world"
+    x: 0.5
+    y: 64.0
+    z: 0.5
+    yaw: 0.0
+    pitch: 0.0
+  # Effects while not logged in
+  effects:
+    blindness: true
+    slowness: true
+    # Prevent any movement
+    freeze: true
+    # Hide armor/held items
+    hide-inventory: true
+    # Hide player from others until logged in
+    hide-from-others: true
+  # NPC/Hologram at auth location
+  hologram:
+    enabled: false  # Requires future HologramAPI
+
+# ============================================================
+# ANIMATED BOSSBAR
+# ============================================================
+bossbar:
+  enabled: true
+  # Colors cycle during countdown
+  colors:
+    - GREEN
+    - YELLOW
+    - RED
+  # Animate (pulse) the bossbar text
+  animate: true
+  # Animation speed (ticks, 20 = 1 second)
+  animation-speed: 10
+
+# ============================================================
+# SOUND EFFECTS
+# ============================================================
+sounds:
+  enabled: true
+  login-success: "ENTITY_PLAYER_LEVELUP"
+  login-fail: "ENTITY_VILLAGER_NO"
+  register-success: "UI_TOAST_CHALLENGE_COMPLETE"
+  register-first-time: "UI_TOAST_CHALLENGE_COMPLETE"
+  timeout-warning: "BLOCK_NOTE_BLOCK_BELL"
+  wrong-password: "ENTITY_ENDERMAN_TELEPORT"
+  captcha-success: "BLOCK_NOTE_BLOCK_PLING"
+  captcha-fail: "ENTITY_VILLAGER_NO"
+  volume: 1.0
+  pitch: 1.0
+
+# ============================================================
+# LOGIN ANIMATIONS
+# ============================================================
+animations:
+  # Particle burst on successful login
+  login-particles:
+    enabled: true
+    type: "TOTEM_OF_UNDYING"
+    count: 50
+  # Firework on FIRST TIME register
+  register-firework:
+    enabled: true
+    colors:
+      - RED
+      - GOLD
+      - YELLOW
+  # Cinematic camera path on join (uses display entities)
+  login-cinematic:
+    enabled: false
+    duration-ticks: 60
+    path:
+      - {x: 0, y: 70, z: 0, yaw: 0, pitch: -30}
+      - {x: 5, y: 72, z: 5, yaw: 45, pitch: -20}
+      - {x: 0, y: 68, z: 0, yaw: 90, pitch: 0}
+
+# ============================================================
+# MOTD CHANGER
+# ============================================================
+motd:
+  enabled: true
+  registered:
+    line1: "&a&lNxAuth &7| &fWelcome Back!"
+    line2: "&7Players: &a{online}&7/&a{max} &8| &7Registered: &a{registered}"
+  unregistered:
+    line1: "&c&lNxAuth &7| &fPlease Register!"
+    line2: "&7Use &e/register <password> &7to create an account"
+  maintenance:
+    line1: "&4&lNxAuth &7| &cMaintenance Mode"
+    line2: "&7We'll be back soon! Follow us on Discord"
+  # Hide real player count
+  hide-player-count: false
+  # Custom server icon per state (put icons in plugins/NxAuth/icons/)
+  custom-icon:
+    registered: "default.png"
+    unregistered: "unregistered.png"
+    maintenance: "maintenance.png"
+
+# ============================================================
+# PER-WORLD AUTH
+# ============================================================
+per-world-auth:
+  enabled: false
+  # Worlds where auth is REQUIRED (leave empty for all worlds)
+  auth-worlds:
+    - "world"
+    - "lobby"
+  # Worlds where auth is SKIPPED (bypass list)
+  bypass-worlds:
+    - "creative"
+    - "admin"
+  # Re-authenticate when switching from bypass to auth world
+  reauth-on-world-switch: false
+
+# ============================================================
+# MAINTENANCE MODE
+# ============================================================
+maintenance:
+  enabled: false
+  # Players with nxauth.admin.maintenance.bypass can still join
+  kick-message: "&cServer is under maintenance!\n&7We'll be back soon."
+  # Show countdown in kick message
+  show-countdown: false
+  countdown-end: "2024-12-31 23:59:59"
+
+# ============================================================
+# ANTI-BOT
+# ============================================================
+antibot:
+  enabled: true
+  # Max joins per second before lockdown
+  join-rate-limit: 10
+  # Lockdown duration in seconds
+  lockdown-duration: 60
+  # Kick bots automatically
+  auto-kick: true
+  # Log bot attempts
+  log-attempts: true
+
+# ============================================================
+# VPN / PROXY DETECTION
+# ============================================================
+vpn-detection:
+  enabled: false
+  # API: ip-api (free) | ipinfo (needs token)
+  api: ip-api
+  api-key: ""
+  # Action: kick | warn | log
+  action: warn
+  # Whitelist IPs from VPN check
+  whitelist:
+    - "127.0.0.1"
+
+# ============================================================
+# GEOIP BLOCKING
+# ============================================================
+geoip:
+  enabled: false
+  # Mode: whitelist (only allow listed) | blacklist (block listed)
+  mode: blacklist
+  countries:
+    - "CN"
+    - "RU"
+  # Path to MaxMind GeoLite2-Country.mmdb
+  database-path: "plugins/NxAuth/GeoLite2-Country.mmdb"
+
+# ============================================================
+# DISCORD WEBHOOK
+# ============================================================
+discord:
+  enabled: false
+  webhook-url: "https://discord.com/api/webhooks/YOUR_WEBHOOK_URL"
+  events:
+    new-register: true
+    login-success: false
+    login-fail: true
+    max-attempts-reached: true
+    maintenance-toggle: true
+    admin-login: true
+    suspicious-activity: true
+    daily-stats: true
+  # Daily stats time (24h format)
+  daily-stats-time: "00:00"
+  # Embed color (hex)
+  color-success: "00FF00"
+  color-danger: "FF0000"
+  color-info: "5865F2"
+
+# ============================================================
+# IN-GAME ADMIN ALERTS
+# ============================================================
+admin-alerts:
+  enabled: true
+  # Permission required to receive alerts
+  permission: "nxauth.admin.alerts"
+  # Alert types
+  alerts:
+    failed-login: true
+    max-attempts: true
+    new-register: true
+    suspicious-ip: true
+    maintenance-toggle: true
+    bot-detection: true
+  # Alert format (actionbar | chat | title)
+  format: actionbar
+
+# ============================================================
+# EMAIL SETTINGS
+# ============================================================
+email:
+  enabled: false
+  smtp:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "your@gmail.com"
+    password: "yourpassword"
+    tls: true
+  from-name: "NxAuth"
+  from-address: "nxauth@yourserver.com"
+  events:
+    suspicious-login: true
+    password-changed: true
+    daily-report: false
+
+# ============================================================
+# BACKUP SETTINGS
+# ============================================================
+backup:
+  enabled: true
+  # Auto backup every X hours
+  interval-hours: 24
+  # Keep last X backups
+  keep-last: 7
+  # Backup location
+  path: "plugins/NxAuth/backups/"
+  # Compress backups
+  compress: true
+
+# ============================================================
+# WEB DASHBOARD
+# ============================================================
+web-dashboard:
+  enabled: true
+  port: 8080
+  # Dashboard password (CHANGE THIS!)
+  admin-password: "ChangeMe123!"
+  # JWT secret for session tokens (CHANGE THIS!)
+  jwt-secret: "NxAuthSuperSecretKey2024ChangeThis"
+  # Session duration in hours
+  session-duration: 24
+  # Allow access from specific IPs only (empty = all)
+  allowed-ips: []
+  # Enable HTTPS (needs ssl-cert and ssl-key)
+  https: false
+  ssl-cert: "plugins/NxAuth/ssl/cert.pem"
+  ssl-key: "plugins/NxAuth/ssl/key.pem"
+
+# ============================================================
+# GENERAL SETTINGS
+# ============================================================
+general:
+  # Default language (must match a messages_XX.yml file)
+  default-language: en
+  # Allow players to set their own language
+  per-player-language: true
+  # Log auth events to console
+  console-logging: true
+  # Log auth events to file
+  file-logging: true
+  log-file: "plugins/NxAuth/logs/auth.log"
+  # Plugin prefix in messages
+  prefix: "&8[&bNxAuth&8] "
+  # Check for updates on startup
+  check-updates: true
+  # Send anonymous usage stats
+  metrics: true

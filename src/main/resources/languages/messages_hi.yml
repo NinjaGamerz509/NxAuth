@@ -1,0 +1,52 @@
+# NxAuth Messages - Hindi
+prefix: "&8[&bNxAuth&8] "
+
+login:
+  prompt: "&eकृपया लॉगिन करें! &f/login <password> &eका उपयोग करें"
+  success: "&aसफलतापूर्वक लॉगिन! वापस आपका स्वागत है, &f{player}&a!"
+  already-logged-in: "&cआप पहले से लॉगिन हैं!"
+  wrong-password: "&cगलत पासवर्ड! &7({attempts} प्रयास शेष)"
+  timeout: "&cलॉगिन समय समाप्त! आपने बहुत देर की।"
+  not-registered: "&cआप रजिस्टर नहीं हैं! &f/register <password> <confirmPassword> &cका उपयोग करें"
+
+register:
+  prompt: "&eस्वागत है! &f/register <password> <confirmPassword> &eसे रजिस्टर करें"
+  success: "&aसफलतापूर्वक रजिस्टर! सर्वर पर आपका स्वागत है, &f{player}&a!"
+  already-registered: "&cआप पहले से रजिस्टर हैं! &f/login <password> &cसे लॉगिन करें"
+  password-mismatch: "&cपासवर्ड मेल नहीं खाते! कृपया फिर से प्रयास करें।"
+  password-too-short: "&cपासवर्ड बहुत छोटा है! न्यूनतम &f{min} &cअक्षर आवश्यक हैं।"
+  password-too-long: "&cपासवर्ड बहुत लंबा है! अधिकतम &f{max} &cअक्षर।"
+  weak-password: "&cपासवर्ड बहुत कमज़ोर है! कृपया मज़बूत पासवर्ड उपयोग करें।"
+
+logout:
+  success: "&aसफलतापूर्वक लॉगआउट!"
+  not-logged-in: "&cआप लॉगिन नहीं हैं!"
+
+changepassword:
+  success: "&aपासवर्ड सफलतापूर्वक बदला गया!"
+  wrong-old-password: "&cपुराना पासवर्ड गलत है!"
+  same-password: "&cनया पासवर्ड पुराने से अलग होना चाहिए!"
+
+captcha:
+  prompt: "&eसमाधान करें: &f{question} &e= ?"
+  success: "&aCaptcha सही! &f/{action} &aसे जारी रखें"
+  fail: "&cगलत उत्तर! फिर प्रयास करें। ({attempts} शेष)"
+  timeout: "&cCaptcha समय समाप्त! कृपया फिर से जुड़ें।"
+
+bossbar:
+  login: "&eलॉगिन &7| &f{time}s शेष | &f/login <password>"
+  register: "&eरजिस्टर &7| &f{time}s शेष | &f/register <pass> <confirm>"
+
+maintenance:
+  kick: "&c&lसर्वर रखरखाव\n\n&7सर्वर वर्तमान में रखरखाव में है।\n&7कृपया बाद में प्रयास करें।"
+  enabled: "&aरखरखाव मोड &cसक्षम&a किया गया!"
+  disabled: "&aरखरखाव मोड &aअक्षम&a किया गया!"
+
+admin:
+  no-permission: "&cआपके पास यह करने की अनुमति नहीं है!"
+  player-not-found: "&cखिलाड़ी &f{player} &cनहीं मिला!"
+  reload-success: "&aNxAuth कॉन्फ़िगरेशन पुनः लोड!"
+
+language:
+  changed: "&aभाषा &fहिंदी &amें बदली गई!"
+  invalid: "&cअमान्य भाषा! उपलब्ध: &f{languages}"

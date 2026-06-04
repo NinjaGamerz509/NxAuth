@@ -1,0 +1,87 @@
+# NxAuth Messages - English
+# Supports color codes: &a, &b, &c, etc.
+# Placeholders: {player}, {time}, {attempts}, {ip}, {world}
+
+prefix: "&8[&bNxAuth&8] "
+
+login:
+  prompt: "&ePlease login! Use &f/login <password>"
+  success: "&aSuccessfully logged in! Welcome back, &f{player}&a!"
+  already-logged-in: "&cYou are already logged in!"
+  wrong-password: "&cWrong password! &7({attempts} attempts remaining)"
+  timeout: "&cLogin timeout! You took too long to login."
+  not-registered: "&cYou are not registered! Use &f/register <password> <confirmPassword>"
+
+register:
+  prompt: "&eWelcome! Register using &f/register <password> <confirmPassword>"
+  success: "&aSuccessfully registered! Welcome to the server, &f{player}&a!"
+  already-registered: "&cYou are already registered! Please login with &f/login <password>"
+  password-mismatch: "&cPasswords do not match! Please try again."
+  password-too-short: "&cPassword too short! Minimum &f{min} &ccharacters required."
+  password-too-long: "&cPassword too long! Maximum &f{max} &ccharacters allowed."
+  weak-password: "&cPassword is too weak! Please use a stronger password."
+
+logout:
+  success: "&aSuccessfully logged out!"
+  not-logged-in: "&cYou are not logged in!"
+
+changepassword:
+  success: "&aPassword changed successfully!"
+  wrong-old-password: "&cOld password is incorrect!"
+  same-password: "&cNew password cannot be same as old password!"
+
+captcha:
+  prompt: "&eSolve this to continue: &f{question} &e= ?"
+  success: "&aCaptcha solved! Continue with &f/{action}"
+  fail: "&cWrong answer! Try again. ({attempts} remaining)"
+  timeout: "&cCaptcha timeout! Please rejoin."
+
+two-factor:
+  prompt: "&eEnter your 2FA code: &f/2fa <code>"
+  success: "&a2FA verified successfully!"
+  fail: "&cInvalid 2FA code! ({attempts} remaining)"
+  enabled: "&a2FA has been enabled! Scan the QR code in the web dashboard."
+  disabled: "&c2FA has been disabled for your account."
+  backup-code-used: "&eBackup code used! &c{remaining} backup codes remaining."
+
+bossbar:
+  login: "&eLogin &7| &f{time}s remaining | &f/login <password>"
+  register: "&eRegister &7| &f{time}s remaining | &f/register <pass> <confirm>"
+
+maintenance:
+  kick: "&c&lServer Maintenance\n\n&7We are currently under maintenance.\n&7Please try again later.\n\n&bFollow our Discord for updates!"
+  enabled: "&aMaintenance mode &cenabled&a!"
+  disabled: "&aMaintenance mode &adisabled&a!"
+
+antibot:
+  lockdown-start: "&cBot attack detected! Server is in lockdown for {time}s"
+  lockdown-end: "&aServer lockdown lifted!"
+  bot-kicked: "&cYou were kicked for suspicious activity."
+
+admin:
+  no-permission: "&cYou don't have permission to do that!"
+  player-not-found: "&cPlayer &f{player} &cnot found!"
+  player-not-registered: "&cPlayer &f{player} &cis not registered!"
+  reload-success: "&aNxAuth configuration reloaded!"
+  force-login-success: "&aForce logged in &f{player}&a!"
+  unregister-success: "&aUnregistered &f{player}&a successfully!"
+  tempban-success: "&aTempbanned &f{player} &afor &f{time} &aminutes!"
+  ipban-success: "&aIP banned &f{ip}&a!"
+
+alerts:
+  failed-login: "&c[NxAuth] Failed login attempt by &f{player} &c(IP: {ip})"
+  max-attempts: "&4[NxAuth] &c{player} &4has been tempbanned for too many failed attempts!"
+  new-register: "&a[NxAuth] &f{player} &ajust registered!"
+  suspicious-ip: "&e[NxAuth] Suspicious IP detected: &f{ip} &efor player &f{player}"
+  bot-attack: "&4[NxAuth] BOT ATTACK DETECTED! &c{count} joins/second!"
+
+language:
+  changed: "&aLanguage changed to &fEnglish&a!"
+  invalid: "&cInvalid language! Available: &f{languages}"
+  list: "&aAvailable languages: &f{languages}"
+
+misc:
+  no-console: "&cThis command cannot be used from console!"
+  usage: "&cUsage: &f{usage}"
+  reload: "&aNxAuth reloaded successfully!"
+  version: "&bNxAuth &fv{version} &7by NxAuth Team"
